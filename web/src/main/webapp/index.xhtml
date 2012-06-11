@@ -1,0 +1,79 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.prime.com.tr/ui"
+	template="/resources/template_invudoo.xhtml">
+	<ui:define name="cabecera">Inicio</ui:define>
+	<ui:define name="content">
+		<h:form id="editor">
+			<h:panelGrid columns="2" cellpadding="4" id="params">
+				<h:outputText id="keywords" value="Búsqueda:" />
+				<h:inputText value="#{searcher.keywords}" required="true"
+					requiredMessage="Es necesario introducir un criterio de búsqueda" />
+
+				<h:outputText id="noContenga" value="No contenga:" />
+				<h:inputText value="#{searcher.noContiene}" />
+
+				<h:outputText id="since" value="Desde" />
+				<p:calendar value="#{searcher.since}" pattern="dd/MM/yyyy" />
+
+				<h:outputText id="until" value="Hasta" />
+				<p:calendar value="#{searcher.until}" pattern="dd/MM/yyyy" />
+
+				<h:outputText id="lang" value="Lenguaje" />
+				<h:selectOneMenu value="#{searcher.query.lang}">
+					<f:selectItem itemValue="es" itemLabel="Español" />
+					<f:selectItem itemValue="en" itemLabel="Inglés" />
+					<f:selectItem itemValue="it" itemLabel="Italiano" />
+				</h:selectOneMenu>
+
+				<h:outputText id="animo" value="Ánimo" />
+				<h:selectOneMenu value="#{searcher.animo}">
+					<f:selectItem itemValue="" itemLabel="Cualquiera" />
+					<f:selectItem itemValue=" :)" itemLabel="Contentos" />
+					<f:selectItem itemValue=" :(" itemLabel="Enfadados" />
+				</h:selectOneMenu>
+
+				<h:commandButton action="#{searcher.search}" value="Buscar"
+					update="list,params" />
+			</h:panelGrid>
+			<p:messages />
+			<h:panelGrid columns="2">
+				<p:dataTable id="list" rendered="#{!empty searcher.results.tweets}"
+					value="#{searcher.results.tweets}" var="t" paginator="true"
+					rows="10"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="5,10,15">
+					<f:facet name="header">
+						<h:outputText value="Lista de tweets" />
+					</f:facet>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Usuario" />
+						</f:facet>
+						<h:outputText value="#{t.fromUser}" />
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Fecha" />
+						</f:facet>
+						<h:outputText value="#{t.createdAt}">
+							<f:convertDateTime pattern="dd/MM/yyyy-HH:mm:ss" />
+						</h:outputText>
+					</p:column>
+					<p:column>
+						<f:facet name="header">
+							<h:outputText value="Texto" />
+						</f:facet>
+						<h:outputText value="#{t.text}" />
+					</p:column>
+				</p:dataTable>
+				<p:lineChart titleX="Horas del día" value="#{searcher.grafica}" var="point"
+					rendered="#{!empty searcher.results.tweets}" xfield="#{point.hour}" >
+					<p:chartSeries label="Número de tweets" value="#{point.count}" />
+				</p:lineChart>
+			</h:panelGrid>
+		</h:form>
+	</ui:define>
+</ui:composition>
